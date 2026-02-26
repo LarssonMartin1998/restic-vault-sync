@@ -5,7 +5,7 @@ pkgs.writeShellApplication {
   runtimeInputs = [
     pkgs.coreutils
     pkgs.openssh
-    pkgs.rsync
+    pkgs.restic
   ];
   text = builtins.readFile ../scripts/restic-vault-sync.sh;
 }

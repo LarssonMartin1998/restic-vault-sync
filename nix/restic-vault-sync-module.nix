@@ -32,28 +32,21 @@ in
       description = "Group used to run the sync service.";
     };
 
-    remotePath = lib.mkOption {
+    localRepo = lib.mkOption {
       type = lib.types.str;
-      description = "Remote path to the restic repository on the vault.";
+      description = "Local restic repository path (destination).";
     };
 
-    localPath = lib.mkOption {
+    remoteRepo = lib.mkOption {
       type = lib.types.str;
-      description = "Local path where the repository will be synced.";
+      description = "Remote restic repository URL (e.g. sftp:host:/path).";
     };
 
-    ssh = {
-      host = lib.mkOption {
-        type = lib.types.str;
-        description = "SSH host entry from ssh config for the vault server.";
-      };
+    passwordFile = lib.mkOption {
+      type = lib.types.str;
+      description = "Path to restic password file for non-interactive access.";
     };
 
-    rsyncExtraArgs = lib.mkOption {
-      type = lib.types.str;
-      default = "";
-      description = "Extra arguments passed to rsync (space-separated).";
-    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -65,12 +58,9 @@ in
         Group = cfg.group;
         ExecStart = "${cfg.package}/bin/restic-vault-sync";
         Environment = [
-          "SSH_HOST=${cfg.ssh.host}"
-          "REMOTE_PATH=${cfg.remotePath}"
-          "LOCAL_PATH=${cfg.localPath}"
-        ]
-        ++ lib.optionals (cfg.rsyncExtraArgs != "") [
-          "RSYNC_EXTRA_ARGS=${cfg.rsyncExtraArgs}"
+          "LOCAL_REPO=${cfg.localRepo}"
+          "REMOTE_REPO=${cfg.remoteRepo}"
+          "RESTIC_PASSWORD_FILE=${cfg.passwordFile}"
         ];
       };
     };
