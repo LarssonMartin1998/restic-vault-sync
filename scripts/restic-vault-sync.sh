@@ -14,7 +14,7 @@ require_env "REMOTE_REPO"
 require_env "RESTIC_PASSWORD_FILE"
 
 if [[ ! -e "$LOCAL_REPO/config" ]]; then
-  restic -r "$LOCAL_REPO" init
+  restic -r "$LOCAL_REPO" --password-file "$RESTIC_PASSWORD_FILE" init
 fi
 
-restic -r "$LOCAL_REPO" copy --from-repo "$REMOTE_REPO"
+restic -r "$LOCAL_REPO" --password-file "$RESTIC_PASSWORD_FILE" copy --from-repo "$REMOTE_REPO"
