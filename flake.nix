@@ -13,11 +13,19 @@
       in
       {
         packages = {
-          restic-vault-sync = pkgs.callPackage ./nix/restic-vault-sync.nix { };
+          restic-vault-sync = pkgs.writeShellApplication {
+            name = "restic-vault-sync";
+            runtimeInputs = [
+              pkgs.coreutils
+              pkgs.openssh
+              pkgs.restic
+            ];
+            text = builtins.readFile ./restic-vault-sync.sh;
+          };
           default = self.packages.${system}.restic-vault-sync;
         };
       })
     // {
-      nixosModules.restic-vault-sync = import ./nix/restic-vault-sync-module.nix;
+      nixosModules.restic-vault-sync = import ./module.nix { inherit self; };
     };
 }

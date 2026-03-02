@@ -1,8 +1,9 @@
+{ self }:
+
 { config, lib, pkgs, ... }:
 
 let
   cfg = config.services.resticVaultSync;
-  defaultPackage = pkgs.callPackage ./restic-vault-sync.nix { };
 in
 {
   options.services.resticVaultSync = {
@@ -10,7 +11,7 @@ in
 
     package = lib.mkOption {
       type = lib.types.package;
-      default = defaultPackage;
+      default = self.packages.${pkgs.system}.restic-vault-sync;
       description = "Package providing the restic vault sync script.";
     };
 
@@ -32,9 +33,9 @@ in
       description = "Group used to run the sync service.";
     };
 
-    localRepo = lib.mkOption {
-      type = lib.types.str;
-      description = "Local restic repository path (destination).";
+    localRepoPaths = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      description = "List of local restic repository paths to sync to.";
     };
 
     remoteRepo = lib.mkOption {
@@ -58,7 +59,7 @@ in
         Group = cfg.group;
         ExecStart = "${cfg.package}/bin/restic-vault-sync";
         Environment = [
-          "LOCAL_REPO=${cfg.localRepo}"
+          "LOCAL_REPO_PATHS=${lib.concatStringsSep ":" cfg.localRepoPaths}"
           "REMOTE_REPO=${cfg.remoteRepo}"
           "RESTIC_PASSWORD_FILE=${cfg.passwordFile}"
         ];
