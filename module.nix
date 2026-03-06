@@ -48,6 +48,26 @@ in
       description = "Path to restic password file for non-interactive access.";
     };
 
+    monitoring = {
+      endpoint = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "URL to POST a pulse to on successful sync.";
+      };
+
+      serviceName = lib.mkOption {
+        type = lib.types.str;
+        default = "restic-vault-sync";
+        description = "Service name sent in the monitoring pulse payload.";
+      };
+
+      tokenFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Path to file containing the bearer token for monitoring.";
+      };
+    };
+
   };
 
   config = lib.mkIf cfg.enable {
@@ -62,6 +82,10 @@ in
           "LOCAL_REPO_PATHS=${lib.concatStringsSep ":" cfg.localRepoPaths}"
           "REMOTE_REPO=${cfg.remoteRepo}"
           "RESTIC_PASSWORD_FILE=${cfg.passwordFile}"
+        ] ++ lib.optionals (cfg.monitoring.endpoint != null) [
+          "PING_ENDPOINT=${cfg.monitoring.endpoint}"
+          "PING_SERVICE_NAME=${cfg.monitoring.serviceName}"
+          "PING_TOKEN_FILE=${cfg.monitoring.tokenFile}"
         ];
       };
     };

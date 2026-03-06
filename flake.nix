@@ -19,6 +19,8 @@
               pkgs.coreutils
               pkgs.openssh
               pkgs.restic
+              pkgs.jq
+              pkgs.xh
             ];
             text = builtins.readFile ./restic-vault-sync.sh;
           };
