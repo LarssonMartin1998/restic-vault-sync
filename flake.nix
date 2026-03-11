@@ -6,8 +6,14 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
       in
@@ -26,8 +32,9 @@
           };
           default = self.packages.${system}.restic-vault-sync;
         };
-      })
+      }
+    )
     // {
-      nixosModules.restic-vault-sync = import ./module.nix { inherit self; };
+      nixosModules.default = import ./module.nix { inherit self; };
     };
 }
