@@ -39,7 +39,7 @@ log "Initializing staging repo at $STAGING_DIR"
 restic -r "$STAGING_DIR" --password-file "$RESTIC_PASSWORD_FILE" init
 
 log "Copying from remote repo into staging"
-restic -r "$STAGING_DIR" --password-file "$RESTIC_PASSWORD_FILE" copy --from-repo "$REMOTE_REPO"
+restic -r "$STAGING_DIR" --password-file "$RESTIC_PASSWORD_FILE" copy --from-repo "$REMOTE_REPO" --from-password-file "$RESTIC_PASSWORD_FILE"
 
 log "Verifying staging repo integrity"
 restic -r "$STAGING_DIR" --password-file "$RESTIC_PASSWORD_FILE" check --read-data
