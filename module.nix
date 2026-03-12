@@ -78,7 +78,9 @@ in
         User = cfg.user;
         Group = cfg.group;
         ExecStart = "${cfg.package}/bin/restic-vault-sync";
+        # Ensure SSH can find keys/config for the configured user
         Environment = [
+          "HOME=${if cfg.user == "root" then "/root" else "/home/${cfg.user}"}"
           "LOCAL_REPO_PATHS=${lib.concatStringsSep ":" cfg.localRepoPaths}"
           "REMOTE_REPO=${cfg.remoteRepo}"
           "RESTIC_PASSWORD_FILE=${cfg.passwordFile}"
