@@ -58,9 +58,22 @@ for path in "${PATHS[@]}"; do
   fi
 
   log "Deploying to $path"
-  rm -rf "$path"
-  mkdir -p "$path"
-  cp -a "$STAGING_DIR/." "$path"
+  target_dir="$(dirname "$path")"
+  target_name="$(basename "$path")"
+  new_path="${target_dir}/${target_name}.new"
+  old_path="${target_dir}/${target_name}.old"
+
+  rm -rf "$new_path"
+  mkdir -p "$new_path"
+  cp -a "$STAGING_DIR/." "$new_path"
+
+  rm -rf "$old_path"
+  if [[ -d "$path" ]]; then
+    mv "$path" "$old_path"
+  fi
+  mv "$new_path" "$path"
+  rm -rf "$old_path"
+
   log "Deployed to $path"
 done
 
