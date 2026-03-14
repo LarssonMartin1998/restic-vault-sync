@@ -44,7 +44,19 @@ restic -r "$STAGING_DIR" --password-file "$RESTIC_PASSWORD_FILE" copy --from-rep
 log "Verifying staging repo integrity"
 restic -r "$STAGING_DIR" --password-file "$RESTIC_PASSWORD_FILE" check --read-data
 
+staging_count=$(restic -r "$STAGING_DIR" --password-file "$RESTIC_PASSWORD_FILE" snapshots --json | jq 'length')
+log "Staging repo has $staging_count snapshot(s)"
+
 for path in "${PATHS[@]}"; do
+  if [[ -d "$path" ]]; then
+    local_count=$(restic -r "$path" --password-file "$RESTIC_PASSWORD_FILE" snapshots --json | jq 'length')
+    log "Local repo $path has $local_count snapshot(s)"
+    if [[ "$staging_count" -lt "$local_count" ]]; then
+      log "ERROR: Staging has fewer snapshots ($staging_count) than local repo $path ($local_count), aborting to protect local data" >&2
+      exit 1
+    fi
+  fi
+
   log "Deploying to $path"
   rm -rf "$path"
   mkdir -p "$path"
